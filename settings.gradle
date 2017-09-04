@@ -1,0 +1,3 @@
+include ':app', ':beetleconnect'
+
+project(':beetleconnect').projectDir = new File(settingsDir, '../Beetled/beetleconnect')
