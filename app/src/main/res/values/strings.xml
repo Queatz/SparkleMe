@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Sparkle Me</string>
-    <string name="starting">Searching for dress...</string>
-    <string name="connected">Connected to dress</string>
-    <string name="needs_permisison">Needs permission to connect</string>
+    <string name="starting">Searching...</string>
+    <string name="connected">Connected</string>
+    <string name="needs_permisison">Needs permission to search</string>
 </resources>

@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Beetle.setFindFirst(true);
         Beetle.initialize(getApplicationContext());
 
         final TextView status = findViewById(R.id.status);
