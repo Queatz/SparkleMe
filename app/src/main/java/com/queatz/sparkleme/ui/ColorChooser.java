@@ -137,7 +137,6 @@ public class ColorChooser extends RelativeLayout {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                 case MotionEvent.ACTION_MOVE:
-                case MotionEvent.ACTION_UP:
                     float angle = (float)Math.atan2(y, x);
                     // need to turn angle [-PI ... PI] into unit [0....1]
                     float unit = angle/(2*PI);

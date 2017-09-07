@@ -3,4 +3,6 @@
     <string name="starting">Searching...</string>
     <string name="connected">Connected</string>
     <string name="needs_permisison">Needs permission to search</string>
+    <string name="connection_lost">Connection lost</string>
+    <string name="auto_on_off">Auto On / Off</string>
 </resources>

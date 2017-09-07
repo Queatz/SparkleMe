@@ -3,11 +3,12 @@ package com.queatz.sparkleme;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -19,17 +20,26 @@ public class MainActivity extends Activity {
 
     private static final int LOCATION = 12;
 
+    private Config config;
+    private BeetleListener beetleListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        config = new Config(this);
         Beetle.setFindFirst(true);
         Beetle.initialize(getApplicationContext());
+
+        setContentView(R.layout.activity_main);
+
+        Beetle.getBeetleManager().setHighPower(true);
+        Beetle.stayConnected(config.autoOnOff());
 
         final TextView status = findViewById(R.id.status);
         final ColorChooser colorChooser = findViewById(R.id.color);
         final SeekBar seekBar = findViewById(R.id.brightness);
+        final CheckBox autoOnOff = findViewById(R.id.autoOnOff);
 
         seekBar.setProgress(50);
 
@@ -57,30 +67,38 @@ public class MainActivity extends Activity {
                     return;
                 }
 
-                Beetle.getBeetleManager().send("+" +
-                        Color.red(color) +
-                        ":" +
-                        Color.green(color) +
-                        ":" +
-                        Color.blue(color) + "=\r\n"
-                );
+                if (config.autoOnOff()) {
+                    config.myColor(color);
+                }
+
+                Func.sendColor(color);
             }
         });
 
-        Beetle.subscribe(new BeetleListener() {
+        autoOnOff.setChecked(config.autoOnOff());
+
+        autoOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean value) {
+                config.autoOnOff(value);
+                Beetle.stayConnected(value);
+                sendConfig();
+            }
+        });
+
+        beetleListener = new BeetleListener() {
             @Override
             public void onDisconnected() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        status.setText(R.string.starting);
+                        status.setText(R.string.connection_lost);
                     }
                 });
             }
 
             @Override
             public void onRead(String string) {
-
             }
 
             @Override
@@ -92,13 +110,14 @@ public class MainActivity extends Activity {
                     }
                 });
             }
-        });
+        };
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        Beetle.subscribe(beetleListener);
         enable();
     }
 
@@ -106,7 +125,12 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
 
+        Beetle.unsubscribe(beetleListener);
         disable();
+    }
+
+    private void sendConfig() {
+        Beetle.getBeetleManager().send("+xd" + (config.autoOnOff() ? "1" : "0") + "=");
     }
 
     private void enable() {
@@ -127,7 +151,9 @@ public class MainActivity extends Activity {
     }
 
     private void disable() {
-        Beetle.getBeetleManager().disable();
+        if (!config.autoOnOff()) {
+            Beetle.getBeetleManager().disable();
+        }
     }
 
     @Override
