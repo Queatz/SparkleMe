@@ -1,14 +1,15 @@
 package com.queatz.sparkleme;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
-import com.queatz.beetleconnect.*;
+import com.queatz.beetleconnect.Beetle;
+import com.queatz.beetleconnect.BeetleListener;
 
 /**
  * Created by jacob on 9/7/17.
  */
 
-public class MyApp extends Application {
+public class MyApp extends MultiDexApplication {
 
     private Config config;
 
